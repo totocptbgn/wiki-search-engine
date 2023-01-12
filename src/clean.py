@@ -11,7 +11,7 @@ tree = ET.parse(filename)
 
 # Traitement des strings
 def string_treatment(str):
-    
+
     # On enlève les majuscules
     str = str.lower()
 
@@ -41,7 +41,7 @@ def text_treatment(txt):
 root = tree.getroot()
 pages = ET.Element('pages')
 for page in tqdm(root[1:]):
- 
+
     # Extraction du titre
     p = ET.SubElement(pages, 'page')
     titre = ET.SubElement(p, 'titre')
@@ -55,9 +55,11 @@ for page in tqdm(root[1:]):
 
     # Extraction des liens
     links = ET.SubElement(p, 'links')
-    links.text = 'Mettre la liste des liens ici'
+    links.text = '\n'.join(
+        [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
+    )
 
 
-# On écrit le fichier xml 
+# On écrit le fichier xml
 output_root = ET.ElementTree(pages)
 output_root.write('out.xml')
