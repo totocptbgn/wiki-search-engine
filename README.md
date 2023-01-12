@@ -9,7 +9,7 @@ Les différents documents et consignes :
 ## Installation des dépendances
 
 ```
-pip install mwparserfromhell
+pip install mwparserfromhell tqdm
 ```
 
 ## Ressources utilisées
