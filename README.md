@@ -6,6 +6,11 @@ Les différents documents et consignes :
 - [TP2](docs/tp2.pdf)
 - [TP3](docs/tp3.pdf)
 
+## Installation des dépendances
+
+```
+pip install mwparserfromhell
+```
 
 ## Ressources utilisées
 
