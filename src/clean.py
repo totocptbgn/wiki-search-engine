@@ -34,7 +34,9 @@ def text_treatment(str):
     # - Extraire les liens
     # - Retirer les mots des structures (genre 'categorie', 'bibliographie', ...)
     # - Ne garder plus que les mots importants (retirer les stop words)
-    
+
+    ceci est une erreur pour test la CI
+
     return str
 
 # Pour chaque page, extraire le titre et le textz, les traiter puis les insérer dans un nouvel élément XML
