@@ -9,7 +9,11 @@ tree = ET.parse(filename)
 
 # Traitement des strings
 def string_treatment(str):
+    
+    # On enlève les majuscules
     str = str.lower()
+
+    # On enlève les accents
     sans_accents = {'é':'e', 'è':'e', 'ê':'e', 'ë':'e', 'ô':'o', 'ö':'o', 'à':'a', 'â':'a', 'ä':'a', 'ù':'u', 'ü':'u', 'û':'u', 'î':'i', 'ï':'i', 'ç':'c'}
     for k in sans_accents.keys():
         str = str.replace(k, sans_accents[k])
@@ -18,14 +22,19 @@ def string_treatment(str):
 # Traitement des textes
 def text_treatment(str):
 
-    # On enlève les balises ref
+    # On enlève les balises ref et leurs contenus
     str = re.sub(r'<ref>([\s\S]*?)</ref>', '', str)
 
     # On enlève du gras et des italiques
     str = str.replace("\'\'\'", "")
     str = str.replace("\'\'", "")
 
-    # TODO: retirer tout ce dont on a pas besoin
+    ## TODO:
+    # - Retirer les structures dont on a pas besoin
+    # - Extraire les liens
+    # - Retirer les mots des structures (genre 'categorie', 'bibliographie', ...)
+    # - Ne garder plus que les mots importants (retirer les stop words)
+    
     return str
 
 # Pour chaque page, extraire le titre et le textz, les traiter puis les insérer dans un nouvel élément XML
