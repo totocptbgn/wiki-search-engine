@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 # Lecture du fichier
 filename = 'data/frwiki10000.xml'
-tree = ET.parse(filename)
 
 # Traitement des strings
 def string_treatment(str):
@@ -23,7 +22,7 @@ def string_treatment(str):
 
 # Traitement des textes
 def text_treatment(txt):
-    txt = txt.replace('&lt;', '<')
+    txt = txt.replace('&lt;', '<') # si on enlève ces 2 lignes pas d'erreur mais mauvais comportement
     txt = txt.replace('&gt;', '>')
 
     # On itère sur les bouts de texte
@@ -37,29 +36,48 @@ def text_treatment(txt):
                     words.append(splited_word)
     return string_treatment(' '.join(words))
 
-# Pour chaque page, extraire le titre et le texte, les traiter puis les insérer dans un nouvel élément XML
-root = tree.getroot()
+
 pages = ET.Element('pages')
-for page in tqdm(root[1:]):
+numPages = 0
+page = None
+titre = None
+text = None
+links = None
 
-    # Extraction du titre
-    p = ET.SubElement(pages, 'page')
-    titre = ET.SubElement(p, 'titre')
-    titre.text = string_treatment(page[0].text)
+# Pour chaque page, extraire le titre et le texte, les traiter puis les insérer dans un nouvel élément XML
+for event, elem in ET.iterparse(filename, events=("start", "end")):
 
-    # Extraction du texte
-    for elem in page[3]:
-        if elem.tag.endswith('text'):
-            text = ET.SubElement(p, 'text')
+    if event == 'start':
+
+        if elem.tag.endswith('page'):
+            page = ET.SubElement(pages, 'page')
+
+        elif elem.tag.endswith('title'):
+            titre = ET.SubElement(page, 'title')
+
+        elif elem.tag.endswith('text'):
+            text = ET.SubElement(page, 'text')
+
+    if event == 'end':
+
+        if elem.tag.endswith('title'):
+            titre.text = string_treatment(elem.text)
+
+        elif elem.tag.endswith('text'):
             text.text = text_treatment(elem.text)
 
-    # Extraction des liens
-    links = ET.SubElement(p, 'links')
-    links.text = '\n'.join(
-        [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
-    )
+            links = ET.SubElement(page, 'links')
+            links.text = '\n'.join(
+                [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
+            )
 
+        elif elem.tag == 'page':
+            numPages += 1
 
-# On écrit le fichier xml
-output_root = ET.ElementTree(pages)
-output_root.write('out.xml')
+            if numPages % 100 == 0:
+                tree = ET.ElementTree(pages)
+                tree.write('out.xml', xml_declaration=True, method='xml')
+                pages.clear()
+
+tree = ET.ElementTree(pages)
+tree.write('out.xml', xml_declaration=True, method='xml')
