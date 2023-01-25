@@ -2,6 +2,16 @@ import xml.etree.ElementTree as ET
 import mwparserfromhell
 import re
 from tqdm import tqdm
+# pip install spacy
+# python -m spacy download fr_core_news_sm
+import spacy
+nlp = spacy.load("fr_core_news_sm")
+from nltk.corpus import stopwords
+from nltk.stem.snowball import SnowballStemmer
+import nltk
+nltk.download('stopwords')
+
+french_stopwords = set(stopwords.words('french'))
 
 # Script qui prends comme entrée un fichier Wikimédia Dump, qui extrait et traite les données nécessaire, puis les écrit dans un XML.
 
@@ -11,14 +21,19 @@ filename = 'data/frwiki10000.xml'
 # Traitement des strings
 def string_treatment(str):
 
-    # On enlève les majuscules
+    # On enlève les majuscules et les stopwords
+    # et on lemmatise
     str = str.lower()
+    doc = nlp(str)
+    words = [token.lemma_ for token in doc if token.text not in french_stopwords]
+
+    str = ' '.join(words)
 
     # On enlève les accents
     sans_accents = {'é':'e', 'è':'e', 'ê':'e', 'ë':'e', 'ô':'o', 'ö':'o', 'à':'a', 'â':'a', 'ä':'a', 'ù':'u', 'ü':'u', 'û':'u', 'î':'i', 'ï':'i', 'ç':'c'}
     for k in sans_accents.keys():
         str = str.replace(k, sans_accents[k])
-    return str
+    return re.sub(r'[^a-zA-Z ]', ' ', str)
 
 # Traitement des textes
 def text_treatment(txt):
@@ -35,6 +50,7 @@ def text_treatment(txt):
                 if len(splited_word) != 0 and re.search('[a-zA-Z]', splited_word):
                     words.append(splited_word)
     return string_treatment(' '.join(words))
+    #return string_treatment(words)
 
 
 pages = ET.Element('pages')
