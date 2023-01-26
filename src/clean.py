@@ -4,14 +4,14 @@ import re
 from tqdm import tqdm
 # pip install spacy
 # python -m spacy download fr_core_news_sm
-import spacy
-nlp = spacy.load("fr_core_news_sm")
-from nltk.corpus import stopwords
-from nltk.stem.snowball import SnowballStemmer
-import nltk
-nltk.download('stopwords')
+#import spacy
+#nlp = spacy.load("fr_core_news_sm")
+#from nltk.corpus import stopwords
+#from nltk.stem.snowball import SnowballStemmer
+#import nltk
+#nltk.download('stopwords')
 
-french_stopwords = set(stopwords.words('french'))
+#french_stopwords = set(stopwords.words('french'))
 
 # Script qui prends comme entrée un fichier Wikimédia Dump, qui extrait et traite les données nécessaire, puis les écrit dans un XML.
 
@@ -24,10 +24,10 @@ def string_treatment(str):
     # On enlève les majuscules et les stopwords
     # et on lemmatise
     str = str.lower()
-    doc = nlp(str)
-    words = [token.lemma_ for token in doc if token.text not in french_stopwords]
+    #doc = nlp(str)
+    #words = [token.lemma_ for token in doc if token.text not in french_stopwords]
 
-    str = ' '.join(words)
+    #str = ' '.join(words)
 
     # On enlève les accents
     sans_accents = {'é':'e', 'è':'e', 'ê':'e', 'ë':'e', 'ô':'o', 'ö':'o', 'à':'a', 'â':'a', 'ä':'a', 'ù':'u', 'ü':'u', 'û':'u', 'î':'i', 'ï':'i', 'ç':'c'}
@@ -36,20 +36,25 @@ def string_treatment(str):
     return re.sub(r'[^a-zA-Z ]', ' ', str)
 
 # Traitement des textes
-def text_treatment(txt):
-    txt = txt.replace('&lt;', '<') # si on enlève ces 2 lignes pas d'erreur mais mauvais comportement
-    txt = txt.replace('&gt;', '>')
 
-    # On itère sur les bouts de texte
-    wiki_array = mwparserfromhell.parse(txt).filter_text()
-    words = []
-    for word in wiki_array:
-        w = str(word)
-        if not (w.startswith('http') or w.startswith('Catégorie:')) and re.search('[a-zA-Z]', w):
-            for splited_word in re.split(r'\W+', str(w)):
-                if len(splited_word) != 0 and re.search('[a-zA-Z]', splited_word):
-                    words.append(splited_word)
-    return string_treatment(' '.join(words))
+def text_treatment(txt):
+    txt = re.sub(r'\<ref([\s\S]*)\<\/ref\>', '', txt)
+    txt = re.sub(r'\<ref([\s\S]*)\/\>', '', txt)
+    return txt, 10000
+    #txt = txt.replace('&lt;', '<') # si on enlève ces 2 lignes pas d'erreur mais mauvais comportement
+    #txt = txt.replace('&gt;', '>')
+    #count = 0
+    ## On itère sur les bouts de texte
+    #wiki_array = mwparserfromhell.parse(txt).filter_text()
+    #words = []
+    #for word in wiki_array:
+    #    w = str(word)
+    #    if not (w.startswith('http') or w.startswith('Catégorie:')) and re.search('[a-zA-Z]', w):
+    #        for splited_word in re.split(r'\W+', str(w)):
+    #            if len(splited_word) != 0 and re.search('[a-zA-Z]', splited_word):
+    #                words.append(splited_word)
+    #                count+=1           
+    #return string_treatment(' '.join(words)), count
     #return string_treatment(words)
 
 
@@ -66,7 +71,7 @@ for event, elem in ET.iterparse(filename, events=("start", "end")):
     if event == 'start':
 
         if elem.tag.endswith('page'):
-            page = ET.SubElement(pages, 'page')
+            page = ET.Element('page')
 
         elif elem.tag.endswith('title'):
             titre = ET.SubElement(page, 'title')
@@ -80,20 +85,22 @@ for event, elem in ET.iterparse(filename, events=("start", "end")):
             titre.text = string_treatment(elem.text)
 
         elif elem.tag.endswith('text'):
-            text.text = text_treatment(elem.text)
+            text.text, count = text_treatment(elem.text)
 
-            links = ET.SubElement(page, 'links')
-            links.text = '\n'.join(
-                [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
-            )
+            if count > 1000 :
+                pages.append(page)
+                links = ET.SubElement(page, 'links')
+                links.text = '\n'.join(
+                    [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
+                )
 
-        elif elem.tag == 'page':
-            numPages += 1
+                numPages += 1
 
-            if numPages % 100 == 0:
-                tree = ET.ElementTree(pages)
-                tree.write('out.xml', xml_declaration=True, method='xml')
-                pages.clear()
+                if numPages % 100 == 0:
+                    tree = ET.ElementTree(pages)
+                    tree.write('out.xml', xml_declaration=True, method='xml')
+                    pages.clear()
 
 tree = ET.ElementTree(pages)
+
 tree.write('out.xml', xml_declaration=True, method='xml')
