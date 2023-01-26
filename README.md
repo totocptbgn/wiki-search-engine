@@ -9,7 +9,7 @@ Les différents documents et consignes :
 ## Installation des dépendances
 
 ```
-pip install mwparserfromhell tqdm
+pip install mwparserfromhell tqdm spacy nltk
 ```
 
 ## Ressources utilisées
