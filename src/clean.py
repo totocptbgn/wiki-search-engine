@@ -52,15 +52,14 @@ def text_treatment(txt):
                     words.append(splited_word)
                     count+=1
     return string_treatment(' '.join(words)), count
-    #return string_treatment(words)
 
-
-pages = ET.Element('pages')
-numPages = 0
 page = None
 titre = None
 text = None
 links = None
+
+with open('out.xml', 'w') as f:
+    f.write('<pages>')
 
 # Pour chaque page, extraire le titre et le texte, les traiter puis les insérer dans un nouvel élément XML
 for event, elem in ET.iterparse(filename, events=("start", "end")):
@@ -85,22 +84,13 @@ for event, elem in ET.iterparse(filename, events=("start", "end")):
             text.text, count = text_treatment(elem.text)
 
             if count > 1000 :
-                pages.append(page)
                 links = ET.SubElement(page, 'links')
                 links.text = '\n'.join(
                     [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
                 )
 
-                numPages += 1
+                with open('out.xml', 'a') as f:
+                    f.write(ET.tostring(page, encoding='unicode', method='xml'))
 
-                if numPages % 100 == 0:
-                    tree = ET.ElementTree(pages)
-                    tree.write('out.xml', xml_declaration=True, method='xml')
-                    pages.clear()
-
-            if numPages > 10000: # TODO: enlever, juste pour un premier test
-                break
-
-tree = ET.ElementTree(pages)
-
-tree.write('out.xml', xml_declaration=True, method='xml')
+with open('out.xml', 'a') as f:
+    f.write('</pages>')
