@@ -8,7 +8,8 @@ nltk.download('stopwords')
 
 # Script qui prends comme entrée un fichier Wikimédia Dump, qui extrait et traite les données nécessaire, puis les écrit dans un XML.
 
-filename = 'data/frwiki10000.xml'
+filename = 'data/frwiki-latest-pages-articles.xml'
+# filename = 'data/frwiki10.xml'
 theme = ['sport', 'sports', 'sportif']
 
 def retire_accents(str):
@@ -58,7 +59,7 @@ titre = None
 text = None
 links = None
 
-with open('out.xml', 'w') as f:
+with open('corpus.xml', 'w') as f:
     f.write('<pages>')
 
 # Pour chaque page, extraire le titre et le texte, les traiter puis les insérer dans un nouvel élément XML
@@ -93,8 +94,8 @@ for event, elem in tqdm(ET.iterparse(filename, events=("start", "end"))):
                     [string_treatment(str(link.title)) for link in mwparserfromhell.parse(elem.text).filter_wikilinks() if not ':' in str(link.title)]
                 )
 
-                with open('out.xml', 'a') as f:
+                with open('corpus.xml', 'a') as f:
                     f.write(ET.tostring(page, encoding='unicode', method='xml'))
 
-with open('out.xml', 'a') as f:
+with open('corpus.xml', 'a') as f:
     f.write('</pages>')
