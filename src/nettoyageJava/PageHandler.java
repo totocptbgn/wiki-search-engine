@@ -33,7 +33,7 @@ public class PageHandler extends DefaultHandler {
         }else if (qName.endsWith("page")) {
             try {
                 page.writeOut(output);
-                if (++nbPagesLues%20 == 0) {
+                if (++nbPagesLues%100 == 0) {
                     System.out.println(nbPagesLues + " pages sont traitées. La dernière est " + page.getTitle() + ".");
                 }
             } catch (IOException e) {
