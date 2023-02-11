@@ -41,7 +41,7 @@ public class Page {
 
     public static void initTheme(String[] theme) {
         // TODO verifier regex
-        Page.themePattern = Pattern.compile("[^A-Za-z]" + String.join("|", theme) + "[^A-Za-z]");
+        Page.themePattern = Pattern.compile("[^A-Za-z]" + String.join("[^A-Za-z]|[^A-Za-z]", theme) + "[^A-Za-z]");
     }
 
     private boolean toWrite() {
