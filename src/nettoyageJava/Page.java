@@ -1,4 +1,5 @@
-import java.io.BufferedWriter;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -48,11 +49,26 @@ public class Page {
         return Page.themePattern.matcher(text).find();
     }
 
-    public void writeOut(BufferedWriter output) throws IOException {
+    public void writeOut(XMLStreamWriter writer) throws IOException, XMLStreamException {
         if (toWrite()) {
-            processLiens();
+            processLiens(); // l'ordre a une importance
             if (processText()) {
-                output.write(toString());
+                writer.writeStartElement("page");
+                writer.writeStartElement("title");
+                writer.writeCharacters(title);
+                writer.writeEndElement();
+                writer.writeStartElement("text");
+                writer.writeCharacters(text);
+                writer.writeEndElement();
+                writer.writeStartElement("links");
+                StringBuilder builder = new StringBuilder();
+                for (String lien: liens) {
+                    builder.append(lien);
+                    builder.append("\n");
+                }
+                writer.writeCharacters(builder.toString());
+                writer.writeEndElement();
+                writer.writeEndElement();
             }
         }
     }
@@ -80,21 +96,5 @@ public class Page {
         while (matcher.find()) {
             liens.add(matcher.group(1));
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("<page><title>");
-        builder.append(title);
-        builder.append("</title><text>");
-        builder.append(text);
-        builder.append("</text><links>");
-        for (String lien: liens) {
-            builder.append(lien);
-            builder.append("\n");
-        }
-        builder.append("</links></page>");
-        return builder.toString();
     }
 }

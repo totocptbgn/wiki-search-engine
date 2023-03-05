@@ -2,18 +2,26 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class PageHandler extends DefaultHandler {
-    private final BufferedWriter output;
+    //private final BufferedWriter output;
+    private final XMLStreamWriter writer;
     private Page page;
     private StringBuilder stringBuilder;
     private long nbPagesLues = 0;
 
-    public PageHandler(BufferedWriter output) {
+    /*public PageHandler(BufferedWriter output) {
         super();
         this.output = output;
+    }*/
+
+    public PageHandler(XMLStreamWriter writer) {
+        super();
+        this.writer = writer;
     }
 
     @Override
@@ -32,11 +40,12 @@ public class PageHandler extends DefaultHandler {
             page.setText(stringBuilder.toString());
         }else if (qName.endsWith("page")) {
             try {
-                page.writeOut(output);
+                //page.writeOut(output);
+                page.writeOut(writer);
                 if (++nbPagesLues%100 == 0) {
                     System.out.println(nbPagesLues + " pages sont traitées. La dernière est " + page.getTitle() + ".");
                 }
-            } catch (IOException e) {
+            } catch (IOException | XMLStreamException e) {
                 throw new RuntimeException(e);
             }
         }
