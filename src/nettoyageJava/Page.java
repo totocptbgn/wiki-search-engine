@@ -21,6 +21,7 @@ public class Page {
     private static final Pattern balisePattern = Pattern.compile("<(.+?)>");
     private static final Pattern internePattern = Pattern.compile("\\s\\[[^\\[](.+?)[^\\]]\\]\\s");
     private static final Pattern colonnePattern = Pattern.compile("\\{\\{colonnes|nombre=\\d");
+
     private static Pattern themePattern;
     private final static int lenMin = 1000 * 6; // minimum de 1000 mots, si on compte qu'un mot fait en moyenne 5 lettres + espaces
 
