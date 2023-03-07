@@ -20,7 +20,7 @@ public class CorpusMain {
             FileOutputStream outputStream = new FileOutputStream(args[1]);
             XMLStreamWriter writer = factory.createXMLStreamWriter(outputStream, "utf-8");
             try {
-                XMLManager.load(input, writer, Arrays.copyOfRange(args, 2, args.length - 1));
+                XMLManager.load(input, writer, Arrays.copyOfRange(args, 2, args.length));
             } finally {
                 writer.flush();
                 writer.close();
