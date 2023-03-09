@@ -1,8 +1,8 @@
-//import java.io.BufferedWriter;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-//import java.io.FileWriter;
-import java.util.Dictionary;
+import java.io.FileWriter;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -12,12 +12,19 @@ public class RecupTitles {
     public static void main(String[] args) {
         try {
             File input = new File(args[0]);
-            //FileWriter outputWriter = new FileWriter(args[1]);
-            //BufferedWriter outputBW = new BufferedWriter(outputWriter);
-            Dictionary<String,Integer> dict = XMLManager.load(input);
-            System.out.println(dict);
+            HashMap<String,Integer> dict = XMLManager.load(input);
             System.out.println("Le dictionnaire contient " + dict.size() + " titres.");
-            //outputBW.close();
+            FileWriter outputWriter = new FileWriter(args[1]);
+            BufferedWriter outputBW = new BufferedWriter(outputWriter);
+            try {
+            XMLManagerLinks.load(input, outputBW, dict);
+
+            } finally {
+                outputBW.flush();
+                outputBW.close();
+                outputWriter.close();
+            }
+
         } catch (IOException e) {
             // TODO: handle exception
             System.out.println("COUCOU");
@@ -28,6 +35,8 @@ public class RecupTitles {
         catch (ParserConfigurationException e) {
             System.out.println("Parser");
         }
+
+
         
     }
 }

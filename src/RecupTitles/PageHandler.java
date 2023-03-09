@@ -4,12 +4,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 //import java.io.BufferedWriter;
 //import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+
 
 public class PageHandler extends DefaultHandler {
     //private final BufferedWriter output;
-    private Dictionary<String,Integer> dict = new Hashtable<>();
+    private HashMap<String,Integer> dict = new HashMap<>();
     private StringBuilder stringBuilder;
     private int nbTitle = 0;
     private Boolean isTitle = false;
@@ -43,7 +43,7 @@ public class PageHandler extends DefaultHandler {
         }
     }
 
-    public Dictionary<String,Integer> getDictionary(){
+    public HashMap<String,Integer> getHashMap(){
         return this.dict;
     }
 }
