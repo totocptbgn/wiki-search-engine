@@ -14,9 +14,6 @@ if (len(sys.argv) != 4):
 
 ## Exercice 2
 
-# On parse le corpus pour compter les occurences de tout les mots contenus dans les balises <text>
-print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
-
 word_page_relationships = dict()        # On garde pour chaque mot, la liste des pages dans lesquelles il apparait
 page_count = 0                          # L'identifiant de la page traitée
 
@@ -39,6 +36,11 @@ for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
             else:
                 word_page_relationships[w] = [(page_count, TFd[w] / Nd)]
         page_count += 1
+        if page_count % 1000 == 0:
+            print("taille de la relation mot page:", len(word_page_relationships))
+            print("nombre de mots différents dans la page en cours:", len(TFd))
+            print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+
 print('Done parsing.')
 print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
 
