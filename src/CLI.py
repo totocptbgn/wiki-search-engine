@@ -1,4 +1,5 @@
 import pickle
+import numpy as np
 
 class CLI:
 
@@ -34,12 +35,16 @@ class CLI:
         return res
 
     def pagerank_steps_from_vec(self, epsilon, n_steps, vector, debug=False):
+        history = []
+        vector = np.array(vector)
         for step in range(n_steps):
-            vector = self.produit_pagerank_vector(epsilon, vector)
+            nvVec = np.array(self.produit_pagerank_vector(epsilon, vector))
+            history.append(abs(vector - nvVec).sum())
+            vector = nvVec
             if debug:
                 print(vector)
                 print(sum(vector))
-        return vector
+        return list(vector), history
 
     def saveLinks(self, input, output):
         for line in input:
@@ -50,4 +55,6 @@ class CLI:
         return self.pagerank_steps_from_vec(epsilon, n_steps, [1 / self.n] * self.n)
 
     def savePagerank(self, epsilon, n_steps, output):
-        pickle.dump(self.pagerank(epsilon, n_steps), output)
+        pagerank, history = self.pagerank(epsilon, n_steps)
+        pickle.dump(pagerank, output)
+        return history
