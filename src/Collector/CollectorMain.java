@@ -2,6 +2,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static java.lang.System.currentTimeMillis;
@@ -24,12 +25,14 @@ public class CollectorMain {
             System.out.println("nombre de pages: " + numberPages);
             WordPageRelationship word_page = textHandler.getWordPageRelationships();
             System.out.println("relation mot page ok: " + word_page.size());
-            for (String w: word_page.keySet()) {
+
+            for (Map.Entry<String, ArrayList<PageRelation>> wordRelations : word_page.entrySet()) {
+                String w = wordRelations.getKey();
                 float idfW = (float) Math.log10(numberPages / word_page.get(w).size());
-                ArrayList<PageRelation> wpr = word_page.get(w);
-                for (PageRelation pr: wpr) {
-                    if (pr.getTF() * idfW < Float.parseFloat(args[3])) {
-                        wpr.remove(pr);
+                ArrayList<PageRelation> wpr = wordRelations.getValue();
+                for (int pr = 0; pr < wpr.size(); pr++) {
+                    if (wpr.get(pr).getTF() * idfW < Float.parseFloat(args[3])) {
+                        wpr.remove(wpr.get(pr));
                         if (wpr.isEmpty()) {
                             word_page.remove(w);
                         }
