@@ -25,8 +25,10 @@ public class CollectorMain {
             System.out.println("nombre de pages: " + numberPages);
             WordPageRelationship word_page = textHandler.getWordPageRelationships();
             System.out.println("relation mot page ok: " + word_page.size());
+            Iterator<Map.Entry<String, ArrayList<PageRelation>>> iterator = word_page.entrySet().iterator();
 
-            for (Map.Entry<String, ArrayList<PageRelation>> wordRelations : word_page.entrySet()) {
+            while (iterator.hasNext()) {
+                Map.Entry<String, ArrayList<PageRelation>> wordRelations = iterator.next();
                 String w = wordRelations.getKey();
                 float idfW = (float) Math.log10(numberPages / word_page.get(w).size());
                 ArrayList<PageRelation> wpr = wordRelations.getValue();
