@@ -45,6 +45,14 @@ public class CollectorMain {
             }
 
             System.out.println("relation mot page après suppressions: " + word_page.size());
+
+            double moy = 0.;
+            for (Map.Entry<String, ArrayList<PageRelation>> wordRelations: word_page.entrySet()) {
+                moy += wordRelations.getValue().size();
+            }
+
+            System.out.println("moyenne nombre de pages par mot: " + (moy / numberPages));
+
             /*
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(args[1]));
