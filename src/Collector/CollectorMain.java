@@ -1,10 +1,6 @@
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -27,18 +23,20 @@ public class CollectorMain {
             WordPageRelationship word_page = textHandler.getWordPageRelationships();
             System.out.println("relation mot page ok: " + word_page.size());
 
-            Iterator<Map.Entry<String, ArrayList<PageRelation>>> iterator = word_page.entrySet().iterator();
+            Iterator<Map.Entry<String, ArrayList<PageRelation>>> wordIterator = word_page.entrySet().iterator();
 
-            while (iterator.hasNext()) {
-                Map.Entry<String, ArrayList<PageRelation>> wordRelations = iterator.next();
+            while (wordIterator.hasNext()) {
+                Map.Entry<String, ArrayList<PageRelation>> wordRelations = wordIterator.next();
                 String w = wordRelations.getKey();
-                float idfW = (float) Math.log10(numberPages / word_page.get(w).size());
                 ArrayList<PageRelation> wpr = wordRelations.getValue();
-                for (int pr = 0; pr < wpr.size(); pr++) {
-                    if (wpr.get(pr).getTF() * idfW < Float.parseFloat(args[3])) {
-                        wpr.remove(wpr.get(pr));
+                float idfW = (float) Math.log10(numberPages / wpr.size());
+                Iterator<PageRelation> pageIterator = wpr.iterator();
+                while (pageIterator.hasNext()) {
+                    PageRelation pr = pageIterator.next();
+                    if (pr.getTF() * idfW < Float.parseFloat(args[3])) {
+                        pageIterator.remove();
                         if (wpr.isEmpty()) {
-                            word_page.remove(w);
+                            wordIterator.remove();
                         }
                     } else {
                         idf.put(w, idfW);
