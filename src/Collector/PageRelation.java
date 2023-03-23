@@ -8,4 +8,8 @@ public class PageRelation implements Serializable {
         this.page = page;
         this.tf = tf;
     }
+
+    public float getTF() {
+        return tf;
+    }
 }
