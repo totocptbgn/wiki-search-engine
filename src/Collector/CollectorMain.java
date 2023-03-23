@@ -47,11 +47,22 @@ public class CollectorMain {
             System.out.println("relation mot page après suppressions: " + word_page.size());
 
             double moy = 0.;
+            int max = 0;
+            int min = 1000;
             for (Map.Entry<String, ArrayList<PageRelation>> wordRelations: word_page.entrySet()) {
-                moy += wordRelations.getValue().size();
+                int size = wordRelations.getValue().size();
+                moy += size;
+                if (size > max) {
+                    max = size;
+                }
+                if (size < min) {
+                    min = size;
+                }
             }
 
             System.out.println("moyenne nombre de pages par mot: " + (moy / numberPages));
+            System.out.println("nombre max de pages contenant un mot: " + max);
+            System.out.println("nombre min de pages contenant un mot: " + min);
 
             /*
             try {
