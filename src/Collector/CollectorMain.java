@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ public class CollectorMain {
             System.out.println("nombre de pages: " + numberPages);
             WordPageRelationship word_page = textHandler.getWordPageRelationships();
             System.out.println("relation mot page ok: " + word_page.size());
+
             Iterator<Map.Entry<String, ArrayList<PageRelation>>> iterator = word_page.entrySet().iterator();
 
             while (iterator.hasNext()) {
