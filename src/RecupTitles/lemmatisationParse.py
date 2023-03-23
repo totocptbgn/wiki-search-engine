@@ -33,27 +33,11 @@ def string_treatment(str):
 
     return str
 
-# Traitement des textes
-
-def text_treatment(txt):
-
-    count = 0
-    # On itère sur les bouts de texte
-    wiki_array = mwparserfromhell.parse(txt).filter_text()
-    words = []
-    for word in wiki_array:
-        w = str(word)
-        if not (w.startswith('http') or w.startswith('Catégorie:')) and re.search('[a-zA-Z]', w):
-            for splited_word in re.split(r'\W+', str(w)):
-                if len(splited_word) != 0 and re.search('[a-zA-Z]', splited_word):
-                    words.append(splited_word)
-                    count+=1
-    return string_treatment(' '.join(words)), count
-
 page = None
 titre = None
 text = None
 links = None
+nbPages = 0
 
 with open('corpusLemm.xml', 'w') as f:
     f.write('<pages>')
@@ -63,33 +47,35 @@ for event, elem in ET.iterparse(filename, events=("start", "end")):
 
     if event == 'start':
 
-        if elem.tag.endswith('page'):
+        if elem.tag == 'page':
             page = ET.Element('page')
+            nbPages += 1
 
-        elif elem.tag.endswith('title'):
+        elif elem.tag == 'title':
             titre = ET.SubElement(page, 'title')
 
-        elif elem.tag.endswith('text'):
+        elif elem.tag == 'text':
             text = ET.SubElement(page, 'text')
 
-        elif elem.tag.endswith('links'):
+        elif elem.tag == 'links':
             links = ET.SubElement(page, 'links')
 
     if event == 'end':
 
-        if elem.tag.endswith('title'):
+        if elem.tag == 'title':
             titre.text = elem.text
 
-        elif elem.tag.endswith('text'):
-            text.text, count = text_treatment(elem.text)
+            if nbPages % 1000 == 0:
+                print(str(nbPages) + " :   " + titre.text)
 
-        elif elem.tag.endswith('links'):
+        elif elem.tag == 'text':
+            text.text = string_treatment(elem.text)
+
+        elif elem.tag == 'links':
             links.text = elem.text
 
-            if count > 1000 :
-
-                with open('corpusLemm.xml', 'a') as f:
-                    f.write(ET.tostring(page, encoding='unicode', method='xml'))
+            with open('corpusLemm.xml', 'a') as f:
+                f.write(ET.tostring(page, encoding='unicode', method='xml'))
 
 with open('corpusLemm.xml', 'a') as f:
     f.write('</pages>')
