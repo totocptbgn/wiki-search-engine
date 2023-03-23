@@ -48,21 +48,25 @@ public class CollectorMain {
 
             double moy = 0.;
             int max = 0;
+            String mostCommon = null;
             int min = 1000;
+            String lessCommon = null;
             for (Map.Entry<String, ArrayList<PageRelation>> wordRelations: word_page.entrySet()) {
                 int size = wordRelations.getValue().size();
                 moy += size;
                 if (size > max) {
                     max = size;
+                    mostCommon = wordRelations.getKey();
                 }
                 if (size < min) {
                     min = size;
+                    lessCommon = wordRelations.getKey();
                 }
             }
 
             System.out.println("moyenne nombre de pages par mot: " + (moy / numberPages));
-            System.out.println("nombre max de pages contenant un mot: " + max);
-            System.out.println("nombre min de pages contenant un mot: " + min);
+            System.out.println("nombre max de pages contenant un mot: " + max + " pour le mot " + mostCommon);
+            System.out.println("nombre min de pages contenant un mot: " + min + " pour le mot " + lessCommon);
 
             /*
             try {
