@@ -34,7 +34,7 @@ def processPage(text, most_commons, idf, minTF_IDF, word_regex, queue):
 
 if __name__ == '__main__':
     affPlaceDiv = 1024 * 1024
-    mem_info = psutil.Process(os.getpid()).memory_info()
+    mem_info = psutil.Process(os.getpid())
 
     if (len(sys.argv) != 6):
         printerr()
@@ -83,7 +83,7 @@ if __name__ == '__main__':
                     inPages[w] = 1
                 page_count += 1
             if page_count % 10000 == 0:
-                print("Memory usage: {:.2f} MB".format(mem_info.rss / affPlaceDiv))
+                print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
     most_commons = [k for k, v in sorted(occur.items(), key=lambda item: item[1], reverse=True)][:nbWords]
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             results.append(pool.apply_async(processPage, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex, queue)))
             page_count += 1
             if page_count % 10000 == 0:
-                print("Memory usage: {:.2f} MB".format(mem_info.rss / affPlaceDiv))
+                print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
     print("sous-dicos ok")
 
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         nb_add += 1
         if nb_add % 1000 == 0:
             print("nombre pages traitées:", nb_add)
-            print("Memory usage: {:.2f} MB".format(mem_info.rss / affPlaceDiv))
+            print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
     pool.close()
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     #                    word_page_relationships[w] = [(page_count, tf[w])]
     #        page_count += 1
     #        if page_count % 10000 == 0:
-    #            print("Memory usage: {:.2f} MB".format(mem_info.rss / affPlaceDiv))
+    #            print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
     print("calcul des relations mot-page fini")
     print("début suppression des idf non utilisés")
