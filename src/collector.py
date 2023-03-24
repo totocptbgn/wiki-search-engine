@@ -9,11 +9,11 @@ import sys
 import math
 
 def printerr(str=None):
-    print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [output file word page relationship] [minimum tf-idf gardé]")
+    print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [output file word page relationship] [minimum tf-idf gardé] [nombre mots max gardés]")
     if str != None:
         print(str)
 
-if (len(sys.argv) != 5):
+if (len(sys.argv) != 6):
     printerr()
     exit()
 
@@ -23,29 +23,55 @@ if minTF_IDF < 0. or minTF_IDF >= 1.:
     printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
     exit()
 
+nbWords = int(sys.argv[5])
+
+if nbWords < 15000:
+    printerr("Minimum de mots à garder: 15000")
+    exit()
+
 idf_file = open(sys.argv[2], 'wb')
 word_page_file = open(sys.argv[3], 'wb')
 
 page_count = 0
 
-print("début du calcul des idf")
+print(f"début du calcul des {nbWords} mots les plus fréquents et init idf")
 
+occur = dict()                          # Dictionnaire : clé = mot, value = nombre d'occurence dans tout les documents
+page_count = 0                          # L'identifiant de la page traitée
 idf = dict()
 
 for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
     if event == 'end' and elem.tag == 'text':
-        wordsInPage = set(elem.text.split())
-        for w in wordsInPage:
-            if w in idf:
+        page = dict()
+        words = elem.text.split()
+        for w in words:
+            if w in page:
+                page[w] += 1
+            else:
+                page[w] = 1
+        for w in page:
+            if w in occur:
+                occur[w] += page[w]
                 idf[w] += 1
             else:
+                occur[w] = page[w]
                 idf[w] = 1
         page_count += 1
-    if page_count % 20000 == 0:
-        print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+        if page_count % 10000 == 0:
+            print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
 
-for w, nb in idf.items():
-    idf[w] = math.log10(page_count / idf[w])
+most_commons = [k for k, v in sorted(occur.items(), key=lambda item: item[1], reverse=True)][:nbWords]
+
+del occur
+
+print(f"fin du calcul des {nbWords} mots les plus fréquents et init idf")
+print("début du calcul des idf")
+
+for w in idf:
+    if w not in most_commons:
+        del idf[w]
+    else:
+        idf[w] = math.log10(page_count / idf[w])
 
 print("calcul des idf fini")
 print("début du calcul des relations mot-page")
@@ -61,7 +87,7 @@ for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
         for w in words:
             if w in tf:
                 tf[w] += 1
-            else:
+            elif w in most_commons:
                 tf[w] = 1
         for w in tf:
             tf[w] = 1 + math.log10(tf[w])
@@ -75,7 +101,7 @@ for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
                 else:
                     word_page_relationships[w] = [(page_count, tf[w])]
         page_count += 1
-        if page_count % 20000 == 0:
+        if page_count % 10000 == 0:
             print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
 
 print("calcul des relations mot-page fini")
