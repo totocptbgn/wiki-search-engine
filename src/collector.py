@@ -107,7 +107,7 @@ for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
 print("calcul des relations mot-page fini")
 print("début suppression des idf non utilisés")
 
-for w in idf:
+for w in list(idf):
     if w not in word_page_relationships:
         del idf[w]
 
