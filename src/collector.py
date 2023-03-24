@@ -8,71 +8,98 @@ import pickle
 import sys
 import math
 
-if (len(sys.argv) != 4):
-    print("Waited: python " + sys.argv[0] + " [input file] [output file word page relationship] [output file idf]")
+def printerr(str=None):
+    print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [output file word page relationship] [minimum tf-idf gardé]")
+    if str != None:
+        print(str)
+
+if (len(sys.argv) != 5):
+    printerr()
     exit()
 
-## Exercice 2
+minTF_IDF = float(sys.argv[4])
 
-word_page_relationships = dict()        # On garde pour chaque mot, la liste des pages dans lesquelles il apparait
-page_count = 0                          # L'identifiant de la page traitée
+if minTF_IDF < 0. or minTF_IDF >= 1.:
+    printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
+    exit()
+
+idf_file = open(sys.argv[2], 'wb')
+word_page_file = open(sys.argv[3], 'wb')
+
+page_count = 0
+
+print("début du calcul des idf")
+
+idf = dict()
 
 for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
     if event == 'end' and elem.tag == 'text':
-        TFd = dict()
-        words = elem.text.split(' ')
-        for w in words:
-            if w != '':
-                if w in TFd:
-                    TFd[w] += 1
-                else:
-                    TFd[w] = 1
-        for w in TFd:
-            TFd[w] = 1 + math.log10(TFd[w])
-        Nd = math.sqrt(sum([tf**2 for tf in TFd.values()]))
-        for w in TFd:
-            if w in word_page_relationships:
-                word_page_relationships[w].append((page_count, TFd[w] / Nd))
+        wordsInPage = set(elem.text.split())
+        for w in wordsInPage:
+            if w in idf:
+                idf[w] += 1
             else:
-                word_page_relationships[w] = [(page_count, TFd[w] / Nd)]
+                idf[w] = 1
         page_count += 1
-        if page_count % 1000 == 0:
-            print("taille de la relation mot page:", len(word_page_relationships))
-            print("nombre de mots différents dans la page en cours:", len(TFd))
+    if page_count % 20000 == 0:
+        print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+
+for w, nb in idf.items():
+    idf[w] = math.log10(page_count / idf[w])
+
+print("calcul des idf fini")
+print("début du calcul des relations mot-page")
+
+page_count = 0
+
+word_page_relationships = dict()
+
+for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
+    if event == 'end' and elem.tag == 'text':
+        tf = dict()
+        words = elem.text.split()
+        for w in words:
+            if w in tf:
+                tf[w] += 1
+            else:
+                tf[w] = 1
+        for w in tf:
+            tf[w] = 1 + math.log10(tf[w])
+        Nd = math.sqrt(sum([t**2 for t in tf.values()]))
+        for w in tf:
+            tf[w] /= Nd
+        for w in tf:
+            if tf[w] * idf[w] >= minTF_IDF:
+                if w in word_page_relationships:
+                    word_page_relationships[w].append((page_count, tf[w]))
+                else:
+                    word_page_relationships[w] = [(page_count, tf[w])]
+        page_count += 1
+        if page_count % 20000 == 0:
             print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
 
-print('Done parsing.')
-print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+print("calcul des relations mot-page fini")
+print("début suppression des idf non utilisés")
 
-print("nombre de mots du corpus:", len(word_page_relationships))
+for w in idf:
+    if w not in word_page_relationships:
+        del idf[w]
 
-with open(sys.argv[2], 'wb') as wpr_out:
-    pickle.dump(word_page_relationships, wpr_out)
+print("fin suppression des idf non utilisés")
 
+print("nombre de mots gardés:", len(idf))
+print("nombre de mots gardés (vérification):", len(word_page_relationships))
 
-# Fonction qui prends en paramêtre un mot s "mal écrit" et le compare à une liste de mots words pour retrouver le mot le plus proche
-#def closest_word(s, words):
-#    return words[np.argmax([SequenceMatcher(None, s, w[0]).ratio() for w in sorted_occur])][0]
+print("début de la sauvegarde des idf")
 
-## Exercice 3
+pickle.dump(idf, idf_file)
 
-# On calcule le coefficient IDF de chaque mot
-IDF = dict()
-for word, page_array in word_page_relationships.items():
-        IDF[word] = math.log10(page_count / len(page_array))
-with open(sys.argv[3], 'wb') as idf_out:
-    pickle.dump(IDF, idf_out)
+print("fin de la sauvegarde des idf")
+print("début de la sauvegarde des relations mot-page")
 
-print('Done IDF.')
-print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+pickle.dump(word_page_relationships, word_page_file)
 
-# Exercice 8
-#TF = dict()
-#for page_index in tqdm(range(page_count)):
-#    array_tf = []
-#    for word, page_array in word_page_relationships.items():
-#        if page_index in page_array:
-#            array_tf.append((1 + np.log10(page_array.count(page_index))) ** 2)
-#    TF[page_index] = np.sqrt(sum(array_tf))
-#print('Done TF.')
-#print("Memory usage: {:.2f} MB".format(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)))
+print("fin de la sauvegarde des relations mot-page")
+
+idf_file.close()
+word_page_file.close()
