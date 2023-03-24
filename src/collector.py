@@ -67,7 +67,7 @@ del occur
 print(f"fin du calcul des {nbWords} mots les plus fréquents et init idf")
 print("début du calcul des idf")
 
-for w in idf:
+for w in list(idf):
     if w not in most_commons:
         del idf[w]
     else:
