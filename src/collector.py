@@ -67,7 +67,7 @@ del occur
 print(f"fin du calcul des {nbWords} mots les plus fréquents et init idf")
 print("début du calcul des idf")
 
-for w in list(idf):
+for w in tqdm(list(idf)):
     if w not in most_commons:
         del idf[w]
     else:
@@ -107,7 +107,7 @@ for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
 print("calcul des relations mot-page fini")
 print("début suppression des idf non utilisés")
 
-for w in list(idf):
+for w in tqdm(list(idf)):
     if w not in word_page_relationships:
         del idf[w]
 
