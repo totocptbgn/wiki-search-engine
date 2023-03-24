@@ -58,6 +58,9 @@ if __name__ == '__main__':
     word_regex = re.compile(r'\b\w+\b')
     num_processes = multiprocessing.cpu_count()
 
+    if num_processes > 1:
+        num_processes //= 2
+
     page_count = 0
 
     print(f"début du calcul des {nbWords} mots les plus fréquents et init idf")
