@@ -24,6 +24,7 @@ def processPage(text, most_commons, idf, minTF_IDF, word_regex, queue):
     Nd = math.sqrt(sum([t**2 for t in tf.values()]))
     for w in tf:
         tf[w] /= Nd
+    result = {}
     for w in tf:
         if tf[w] * idfAll[w] >= minTF_IDF:
             if w in result:
