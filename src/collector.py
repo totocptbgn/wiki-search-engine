@@ -18,8 +18,8 @@ def printerr(str=None):
     if str != None:
         print(str)
 
-def processPageDict(text, most_commons, idf, minTF_IDF, page_count, word_regex):
-    words = [w for w in word_regex.findall(text) if w in most_commons]
+def processPageDict(text, idf, minTF_IDF, page_count, word_regex):
+    words = [w for w in word_regex.findall(text) if w in idf.keys()]
     tf = Counter(words)
     for w in tf:
         tf[w] = 1 + math.log10(tf[w])
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         results = Queue()
         for event, elem in tqdm(etree.iterparse(args.input_file, events=("end",))):
             if elem.tag == 'text':
-                results.get(pool.apply_async(processPageDict, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex)))
+                results.get(pool.apply_async(processPageDict, args=(elem.text, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
                     print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
