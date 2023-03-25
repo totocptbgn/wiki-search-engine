@@ -75,7 +75,7 @@ if __name__ == '__main__':
         results = Queue()
         for event, elem in tqdm(etree.iterparse(args.input_file, events=("end",))):
             if elem.tag == 'text':
-                results.get(pool.apply_async(processPageDict, args=(elem.text, idfAll, minTF_IDF, page_count, word_regex)))
+                results.put(pool.apply_async(processPageDict, args=(elem.text, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
                     print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
