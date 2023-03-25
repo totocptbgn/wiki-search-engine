@@ -57,8 +57,9 @@ if __name__ == '__main__':
         printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
         exit()
 
-    with open(args.idf_file, 'rb') as idf_file:
-        idfAll = pickle.load(idf_file)
+    idf_file_r = open(args.idf_file, 'rb')
+    idfAll = pickle.load(idf_file_r)
+    idf_file_r.close()
 
     idf_file = open(args.idf_file, 'wb')
     word_page_file = open(args.word_page_file, 'wb')
