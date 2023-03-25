@@ -82,7 +82,6 @@ if __name__ == '__main__':
                     print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
         print("sous-dicos ok")
-        print("nombre de résultats:", len(results))
 
         nb_add = 0
 
