@@ -10,6 +10,7 @@ import re
 import multiprocessing
 from multiprocessing import Pool
 import numpy as np
+from queue import Queue
 
 def printerr(str=None):
     print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [output file word page relationship] [minimum tf-idf gardé] [nombre mots max gardés]")
@@ -108,10 +109,10 @@ if __name__ == '__main__':
     word_page_relationships = dict()
 
     with Pool(processes=num_processes) as pool:
-        results = []
+        results = Queue()
         for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
             if event == 'end' and elem.tag == 'text':
-                results.append(pool.apply_async(processPage, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex)))
+                results.get(pool.apply_async(processPage, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
                     print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
@@ -121,8 +122,8 @@ if __name__ == '__main__':
 
         nb_add = 0
 
-        for result in tqdm(results):
-            page_dict = result.get()
+        while not results.empty():
+            page_dict = results.get().get()
             for w, l in page_dict.items():
                 wordEntry = word_page_relationships.get(w)
                 if wordEntry is not None:
