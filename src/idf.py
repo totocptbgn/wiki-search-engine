@@ -7,6 +7,7 @@ import os
 import re
 from collections import Counter
 import math
+import pickle
 
 def printerr(str=None):
     print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [nombre mots max gardés]")
