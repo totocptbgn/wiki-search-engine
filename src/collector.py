@@ -8,7 +8,7 @@ import math
 from collections import Counter
 import re
 import multiprocessing
-from multiprocessing import Pool, Queue
+from multiprocessing import Pool
 import numpy as np
 
 def printerr(str=None):
@@ -26,12 +26,12 @@ def processPage(text, most_commons, idf, minTF_IDF, word_regex, queue):
         tf[w] /= Nd
     result = {}
     for w in tf:
-        if tf[w] * idfAll[w] >= minTF_IDF:
+        if tf[w] * idf[w] >= minTF_IDF:
             if w in result:
                 result[w].append((page_count, tf[w]))
             else:
                 result[w] = [(page_count, tf[w])]
-    queue.put(result)
+    return result
 
 if __name__ == '__main__':
     affPlaceDiv = 1024 * 1024
@@ -105,36 +105,34 @@ if __name__ == '__main__':
 
     page_count = 0
 
-    pool = Pool(processes=num_processes)
-    queue = Queue()
-    results = []
-
-    for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
-        if event == 'end' and elem.tag == 'text':
-            results.append(pool.apply_async(processPage, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex, queue)))
-            page_count += 1
-            if page_count % 10000 == 0:
-                print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
-
-    print("sous-dicos ok")
-
     word_page_relationships = dict()
 
-    nb_add = 0
+    with Pool(processes=num_processes) as pool:
+        results = []
+        for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
+            if event == 'end' and elem.tag == 'text':
+                results.append(pool.apply_async(processPage, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex)))
+                page_count += 1
+                if page_count % 10000 == 0:
+                    print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
-    while not queue.empty():
-        page_dict = queue.get()
-        for w, l in page_dict.items():
-            if w in word_page_relationships:
-                word_page_relationships[w].extend(l)
-            else:
-                word_page_relationships[w] = l
-        nb_add += 1
-        if nb_add % 1000 == 0:
-            print("nombre pages traitées:", nb_add)
-            print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
+        print("sous-dicos ok")
+        print("nombre de résultats:", len(results))
 
-    pool.close()
+        nb_add = 0
+
+        for result in tqdm(results):
+            page_dict = result.get()
+            for w, l in page_dict.items():
+                if w in word_page_relationships:
+                    word_page_relationships[w].extend(l)
+                else:
+                    word_page_relationships[w] = l
+            nb_add += 1
+            if nb_add % 1000 == 0:
+                print("nombre pages traitées:", nb_add)
+                print("Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
+
 
     #for event, elem in tqdm(ET.iterparse(sys.argv[1], events=("start", "end"))):
     #    if event == 'end' and elem.tag == 'text':
