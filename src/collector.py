@@ -16,7 +16,7 @@ def printerr(str=None):
     if str != None:
         print(str)
 
-def processPage(text, most_commons, idf, minTF_IDF, word_regex, queue):
+def processPage(text, most_commons, idf, minTF_IDF, page_count, word_regex):
     words = [w for w in word_regex.findall(text) if w in most_commons]
     tf = Counter(words)
     for w in tf:
