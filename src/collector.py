@@ -124,8 +124,9 @@ if __name__ == '__main__':
         for result in tqdm(results):
             page_dict = result.get()
             for w, l in page_dict.items():
-                if w in word_page_relationships:
-                    word_page_relationships[w].extend(l)
+                wordEntry = word_page_relationships.get(w)
+                if wordEntry is not None:
+                    wordEntry.extend(l)
                 else:
                     word_page_relationships[w] = l
             nb_add += 1
