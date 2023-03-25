@@ -76,12 +76,13 @@ def main():
                     print(f"{nb_pages} :   {title.text}")
             elif elem.tag == 'text':
                 text.text = string_treatment(elem.text)
-            elif elem.tag == 'links': 
-                links.text = '\n'.join(set(line_regex.findall(elem.text)))
+            elif elem.tag == 'links':
+                if elem.text is not None:
+                    links.text = '\n'.join(set(line_regex.findall(elem.text)))
                 with open(sys.argv[2], 'ab') as f:
                     f.write(ET.tostring(page, encoding='utf-8', method='xml'))
                     #f.write(ET.tostring(links, encoding='utf-8', method='xml'))
-    
+
     with open(sys.argv[2], 'a') as f:
         f.write('</pages>')
 
