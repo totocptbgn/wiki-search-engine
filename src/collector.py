@@ -57,11 +57,9 @@ if __name__ == '__main__':
         printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
         exit()
 
-    idf_file_r = open(args.idf_file, 'rb')
-    idfAll = pickle.load(idf_file_r)
-    idf_file_r.close()
+    with open(args.idf_file, 'rb') as idf_file_r:
+        idfAll = pickle.load(idf_file_r)
 
-    idf_file = open(args.idf_file, 'wb')
     word_page_file = open(args.word_page_file, 'wb')
 
     word_regex = re.compile(r'\b\w+\b')
@@ -115,7 +113,8 @@ if __name__ == '__main__':
 
     print("début de la sauvegarde des idf")
 
-    pickle.dump(idf, idf_file)
+    with open(args.idf_file, 'wb') as idf_file:
+        pickle.dump(idf, idf_file)
 
     print("fin de la sauvegarde des idf")
     print("début de la sauvegarde des relations mot-page")
@@ -124,5 +123,4 @@ if __name__ == '__main__':
 
     print("fin de la sauvegarde des relations mot-page")
 
-    idf_file.close()
     word_page_file.close()
