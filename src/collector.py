@@ -14,7 +14,7 @@ import argparse
 import sys
 
 def printerr(str=None):
-    print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [output file word page relationship] [minimum tf-idf gardé] [nombre mots max gardés]")
+    print("Waited: python " + sys.argv[0] + " [input file] [input file idf] [output file word page relationship] [minimum tf-idf gardé]")
     if str != None:
         print(str)
 
@@ -37,7 +37,7 @@ def processPageDict(text, most_commons, idf, minTF_IDF, page_count, word_regex):
 
 if __name__ == '__main__':
 
-    if (len(sys.argv) != 6):
+    if (len(sys.argv) != 5):
         printerr()
         exit()
 
@@ -46,7 +46,6 @@ if __name__ == '__main__':
     parser.add_argument('idf_file')
     parser.add_argument('word_page_file')
     parser.add_argument('minTF_IDF')
-    parser.add_argument('nb_words')
     args = parser.parse_args()
 
     affPlaceDiv = 1024 * 1024
@@ -58,11 +57,8 @@ if __name__ == '__main__':
         printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
         exit()
 
-    nbWords = int(args.nb_words)
-
-    if nbWords < 15000:
-        printerr("Minimum de mots à garder: 15000")
-        exit()
+    with open(args.idf_file, 'rb') as idf_file:
+        idfAll = pickle.load(idf_file)
 
     idf_file = open(args.idf_file, 'wb')
     word_page_file = open(args.word_page_file, 'wb')
@@ -70,49 +66,9 @@ if __name__ == '__main__':
     word_regex = re.compile(r'\b\w+\b')
     num_processes = multiprocessing.cpu_count() - 2
 
-    page_count = 0
-
-    print(f"début du calcul des {nbWords} mots les plus fréquents et init idf")
-
-    occur = dict()                          # Dictionnaire : clé = mot, value = nombre d'occurence dans tout les documents
-    page_count = 0                          # L'identifiant de la page traitée
-    inPages = dict()
-    text = []
-
-    for event, elem in tqdm(etree.iterparse(args.input_file, events=("end",))):
-        if elem.tag == 'text':
-            words = word_regex.findall(elem.text)
-            page = Counter(words)
-            for w in page:
-                if w in occur:
-                    occur[w] += page[w]
-                    inPages[w] += 1
-                else:
-                    occur[w] = page[w]
-                    inPages[w] = 1
-                page_count += 1
-            if page_count % 10000 == 0:
-                print(str(page_count) + "Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
-
-    most_commons = [k for k, v in sorted(occur.items(), key=lambda item: item[1], reverse=True)][:nbWords]
-
-    del occur
-
-    print(f"fin du calcul des {nbWords} mots les plus fréquents et init idf")
-    print("début du calcul des idf")
-
-    idfAll = dict()
-
-    for w in tqdm(most_commons):
-        idfAll[w] = math.log10(page_count / inPages[w])
-
-    del inPages
-
-    print("calcul des idf fini")
     print("début du calcul des relations mot-page")
 
     page_count = 0
-
     word_page_relationships = dict()
 
     with Pool(processes=num_processes) as pool:
@@ -122,7 +78,7 @@ if __name__ == '__main__':
                 results.get(pool.apply_async(processPageDict, args=(elem.text, most_commons, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
-                    print(str(page_count) + "Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
+                    print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
         print("sous-dicos ok")
         print("nombre de résultats:", len(results))
@@ -140,7 +96,7 @@ if __name__ == '__main__':
             nb_add += 1
             if nb_add % 1000 == 0:
                 print("nombre pages traitées:", nb_add)
-                print(str(nb_add) + "Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
+                print(str(nb_add) + "    Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
 
     print("calcul des relations mot-page fini")
     print("début suppression des idf non utilisés")
