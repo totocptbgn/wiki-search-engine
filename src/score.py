@@ -2,16 +2,17 @@ import math
 import pickle
 import unicodedata
 from nltk.stem.snowball import FrenchStemmer
+import re
 
 stemmer = FrenchStemmer()
 
 with open("../data/idf.dict", 'rb') as idf_file:
     idf = pickle.load(idf_file)
 
-with open("../data/pagerank.vector") as pagerank_file:
+with open("../data/pagerank.vector", 'rb') as pagerank_file:
     pageranks = pickle.load(pagerank_file)
 
-with open("../data/word_page.dict") as word_page_file:
+with open("../data/word_page.dict", 'rb') as word_page_file:
     word_page_relationships = pickle.load(word_page_file)
 
 spec_regex = re.compile(r'[^a-z ]+')

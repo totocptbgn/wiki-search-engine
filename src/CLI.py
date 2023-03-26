@@ -46,10 +46,9 @@ class CLI:
                 print(sum(vector))
         return list(vector), history
 
-    def saveLinks(self, input, output):
+    def addAllLinks(self, input):
         for line in input:
             self.add_line([int(w) for w in line.split(',')[:-1]])
-        pickle.dump(self, output)
 
     def pagerank(self, epsilon, n_steps):
         return self.pagerank_steps_from_vec(epsilon, n_steps, [1 / self.n] * self.n)

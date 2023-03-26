@@ -43,7 +43,7 @@ def process_page(elem, nb_pages):
     return page
 
 if __name__ == '__main__':
-    pool = Pool(processes=cpu_count() // 2)
+    pool = Pool(processes=cpu_count() - 2)
     with open(args.output_file, 'wb') as f:
         f.write(b'<pages>')
         nb_pages = 0

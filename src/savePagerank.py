@@ -11,9 +11,10 @@ if (nb_args != 5 and nb_args != 6):
     exit()
 
 with open(sys.argv[1], 'r') as input, open(sys.argv[2], 'wb') as output:
-    cli = pickle.load(open(sys.argv[1], 'rb'))
+    cli = CLI.CLI()
+    cli.addAllLinks(input)
     nb_steps = int(sys.argv[4])
-    history = cli.savePagerank(float(sys.argv[3]), nb_steps, open(sys.argv[2], 'wb'))
+    history = cli.savePagerank(float(sys.argv[3]), nb_steps, output)
     x = np.arange(1, nb_steps+1)
     fig, ax = plt.subplots()
     ax.plot(x, np.array(history))
