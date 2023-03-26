@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>wiki</title>
+</head>
+<body>
+    <form method="POST" class="search-form">
+        <input type="text" name="search_text" placeholder="Entrez votre recherche" class="search-input">
+        <button type="submit" class="search-button">Search</button>
+    </form>
+
+    <div id="results">
+        {% for result in search_results %}
+            <p>{{ result }}</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
