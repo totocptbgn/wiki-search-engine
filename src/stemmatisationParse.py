@@ -15,7 +15,7 @@ parser.add_argument('input_file')
 parser.add_argument('output_file')
 args = parser.parse_args()
 
-with open('out.txt') as f:
+with open('stopwords.txt', 'r') as f:
     sw_list = set(f.read().splitlines())
 
 def string_treatment(string):

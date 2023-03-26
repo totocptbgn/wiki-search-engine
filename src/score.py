@@ -17,6 +17,9 @@ with open("../data/word_page.dict", 'rb') as word_page_file:
 
 spec_regex = re.compile(r'[^a-z ]+')
 
+with open('stopwords.txt', 'r') as f:
+    sw_list = set(f.read().splitlines())
+
 def common_pages(list):
     k=len(list)
     pointeur = [0]*k
@@ -68,4 +71,4 @@ def requete2words(requete):
     requete = unicodedata.normalize('NFKD', requete)
     requete = ''.join(c for c in requete if not unicodedata.combining(c))
     requete = spec_regex.sub(r'', requete)
-    return [stemmer.stem(w) for w in requete.split()]
+    return [stemmer.stem(w) for w in requete.split() if w not in sw_list]
