@@ -74,7 +74,7 @@ if __name__ == '__main__':
             if elem.tag == 'title':
                 words_title = requete2words(elem.text)
             if elem.tag == 'text':
-                results.put(pool.apply_async(processPageDict, args=(words_title, lem.text, idfAll, minTF_IDF, page_count, word_regex)))
+                results.put(pool.apply_async(processPageDict, args=(words_title, elem.text, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
                     print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
