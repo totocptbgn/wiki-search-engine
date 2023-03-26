@@ -4,6 +4,8 @@ import re
 
 stemmer = FrenchStemmer()
 
+spec_regex = re.compile(r'[^a-z ]+')
+
 with open('stopwords.txt', 'r') as f:
     sw_list = set(f.read().splitlines())
 
