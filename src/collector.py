@@ -18,21 +18,22 @@ def printerr(str=None):
     if str != None:
         print(str)
 
-def processPageDict(text, idf, minTF_IDF, page_count, word_regex):
+def processPageDict(words_title, text, idf, minTF_IDF, page_count, word_regex):
+    tfTitle = Counter(words_title)
     words = [w for w in word_regex.findall(text) if w in idf.keys()]
     tf = Counter(words)
     for w in tf:
-        tf[w] = 1 + math.log10(tf[w])
+        wTitle = tfTitle.get(w)
+        if wTitle == None:
+            wTitle = 0
+        tf[w] = 1 + math.log10(tf[w] + wTitle)
     Nd = math.sqrt(sum([t**2 for t in tf.values()]))
     for w in tf:
         tf[w] /= Nd
     result = {}
     for w in tf:
-        if tf[w] * idf[w] >= minTF_IDF:
-            if w in result:
-                result[w].append((page_count, tf[w]))
-            else:
-                result[w] = [(page_count, tf[w])]
+        if w in tfTitle or tf[w] * idf[w] >= minTF_IDF:
+            result[w] = [(page_count, tf[w])]
     return result
 
 if __name__ == '__main__':
@@ -69,8 +70,10 @@ if __name__ == '__main__':
     with Pool(processes=num_processes) as pool:
         results = Queue()
         for event, elem in tqdm(etree.iterparse(args.input_file, events=("end",))):
+            if elem.tag == 'title':
+                words_title = requete2words(elem.text)
             if elem.tag == 'text':
-                results.put(pool.apply_async(processPageDict, args=(elem.text, idfAll, minTF_IDF, page_count, word_regex)))
+                results.put(pool.apply_async(processPageDict, args=(words_title, lem.text, idfAll, minTF_IDF, page_count, word_regex)))
                 page_count += 1
                 if page_count % 10000 == 0:
                     print(str(page_count) + "   Memory usage: {:.2f} MB".format(mem_info.memory_info().rss / affPlaceDiv))
