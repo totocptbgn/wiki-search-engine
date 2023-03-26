@@ -48,12 +48,13 @@
 
     <div id="results" style="display: {% if search_results %}block{% else %}none{% endif %};">
         {% if search_results %}
-            {% for result in search_results %}
-                <p>{{ result }}</p>
+            {% for title, link in search_results %}
+                <p><a href="{{ link }}">{{ title }}</a></p>
             {% endfor %}
         {% else %}
             <p>Aucun résultat trouvé</p>
         {% endif %}
+
     </div>
 </body>
 </html>
