@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/styles.css">
-    <title>wiki</title>
+    <title>Recherche Wikipédia</title>
     <script>
         function toggleAdvancedSettings() {
             const advancedSettings = document.getElementById("advanced-settings");
@@ -28,9 +28,9 @@
 <body>
     <form method="POST" class="search-form">
         <div class="search-container">
-            <input type="text" name="search_text" placeholder="Entrez votre recherche" class="search-input">
+            <input type="text" name="search_text" placeholder="Entrez votre requête" class="search-input">
             <button type="submit" class="search-button">Rechercher</button>
-            <button type="button" class="advanced-button" onclick="toggleAdvancedSettings()">Avancé</button>
+            <button type="button" class="advanced-button" onclick="toggleAdvancedSettings()">Params</button>
         </div>
         <div id="advanced-settings" style="display:none;">
 
