@@ -17,7 +17,7 @@ form {
     border-radius: 2px;
 }
 
-.search-form {
+.search-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -26,6 +26,10 @@ form {
 .search-input {
     flex-grow: 1;
     margin-right: 10px;
+}
+
+.advanced-button {
+    margin-left: 5px;
 }
 
 button {
@@ -40,6 +44,17 @@ button:hover {
     background-color: #eaecf0;
 }
 
+#advanced-settings {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+}
+
 #results {
     background-color: #fff;
     padding: 20px;
@@ -49,4 +64,12 @@ button:hover {
 
 #results p {
     margin: 10px 0;
+}
+
+.slider-container {
+    width: 50%;
+}
+
+.slider {
+    width: 100%;
 }

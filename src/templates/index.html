@@ -5,11 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/styles.css">
     <title>wiki</title>
+    <script>
+        function toggleAdvancedSettings() {
+            const advancedSettings = document.getElementById("advanced-settings");
+            if (advancedSettings.style.display === "none") {
+                advancedSettings.style.display = "flex";
+            } else {
+                advancedSettings.style.display = "none";
+            }
+        }
+
+        function updateAlphaValue(value) {
+            document.getElementById("alpha-value").textContent = value;
+        }
+
+        function updateGammaValue(value) {
+            document.getElementById("gamma-value").textContent = value;
+        }
+
+    </script>
+    
+    
 </head>
 <body>
     <form method="POST" class="search-form">
-        <input type="text" name="search_text" placeholder="Entrez votre recherche" class="search-input">
-        <button type="submit" class="search-button">Search</button>
+        <div class="search-container">
+            <input type="text" name="search_text" placeholder="Entrez votre recherche" class="search-input">
+            <button type="submit" class="search-button">Rechercher</button>
+            <button type="button" class="advanced-button" onclick="toggleAdvancedSettings()">Avancé</button>
+        </div>
+        <div id="advanced-settings" style="display:none;">
+
+            <div class="slider-container">
+                <label for="alpha">Alpha: <span id="alpha-value">0.50</span></label>
+                <input type="range" min="0" max="1" step="0.01" value="0.5" name="alpha" class="slider" id="alpha" oninput="updateAlphaValue(this.value);" style="margin-right: 10px;">
+            </div>
+            <div class="slider-container">
+                <label for="gamma" style="margin-left: 10px;">Gamma: <span id="gamma-value">0.50</span></label>
+                <input type="range" min="0" max="1" step="0.01" value="0.5" name="gamma" class="slider" id="gamma" oninput="updateGammaValue(this.value);">
+            </div>
+            
+        </div>
     </form>
 
     <div id="results">

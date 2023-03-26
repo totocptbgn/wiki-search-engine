@@ -72,5 +72,3 @@ def bestPages(alpha, gamma, requete):
     pages = common_pages(word_page)
     return [titles[s] for s in scores(alpha, gamma, idfs, pages, pageranks)]
 
-# test pour toto
-# print(bestPages(0.5, 0.5, "football paris")[:10])
