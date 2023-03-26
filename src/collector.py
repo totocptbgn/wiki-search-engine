@@ -37,10 +37,6 @@ def processPageDict(text, idf, minTF_IDF, page_count, word_regex):
 
 if __name__ == '__main__':
 
-    if (len(sys.argv) != 5):
-        printerr()
-        exit()
-
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file')
     parser.add_argument('idf_file')

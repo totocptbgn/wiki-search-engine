@@ -10,17 +10,8 @@ import math
 import pickle
 from string2words import requete2words
 
-def printerr(str=None):
-    print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [nombre mots max gardés]")
-    if str != None:
-        print(str)
-
 
 if __name__ == '__main__':
-
-    if (len(sys.argv) != 4):
-        printerr()
-        exit()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file')
