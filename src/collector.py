@@ -50,7 +50,7 @@ if __name__ == '__main__':
     minTF_IDF = float(args.minTF_IDF)
 
     if minTF_IDF < 0. or minTF_IDF >= 1.:
-        printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclus et 1 exclu")
+        printerr("Le minimum de TF-IDF à garder doit être un flottant compris entre 0 inclu et 1 exclu")
         exit()
 
     with open(args.idf_file, 'rb') as idf_file_r:

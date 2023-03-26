@@ -17,6 +17,8 @@ with open("../data/titles.vector", 'rb') as titles_file:
 
 def common_pages(list):
     k=len(list)
+    if k == 0:
+        return []
     pointeur = [0]*k
     L = []
     count = 0
