@@ -69,7 +69,6 @@ def bestPages(alpha, gamma, requete):
         i = idf.get(w)
         if i is not None:
             idfs.append(i)
-    print(word_page)
     pages = common_pages(word_page)
     return [titles[s] for s in scores(alpha, gamma, idfs, pages, pageranks)]
 
