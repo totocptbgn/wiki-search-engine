@@ -43,6 +43,10 @@ if __name__ == '__main__':
         if elem.tag == 'title':
             for w in requete2words(elem.text):
                 occur[w] = math.inf
+                if w in inPages:
+                    inPages[w] += 1
+                else:
+                    inPages[w] = 1
         if elem.tag == 'text':
             words = word_regex.findall(elem.text)
             page = Counter(words)
