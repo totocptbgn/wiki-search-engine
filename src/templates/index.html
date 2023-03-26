@@ -28,7 +28,7 @@
 <body>
     <form method="POST" class="search-form">
         <div class="search-container">
-            <input type="text" name="search_text" placeholder="Entrez votre requête" class="search-input">
+            <input type="text" name="search_text" value="{{ user_input }}" placeholder="Entrez votre requête" class="search-input">
             <button type="submit" class="search-button">Rechercher</button>
             <button type="button" class="advanced-button" onclick="toggleAdvancedSettings()">Params</button>
         </div>

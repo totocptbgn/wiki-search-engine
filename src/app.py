@@ -13,6 +13,7 @@ def index():
     results = []
     alpha = 0.5
     gamma = 0.5
+    user_input = ""
 
     if request.method == "POST":
         user_input = request.form.get("search_text")
@@ -24,7 +25,7 @@ def index():
         if len(results) == 0:
             results = ["<p style=\"margin-top: 0px;margin-bottom: 0px;\">Aucun résultat trouvé...</p>"]
 
-    return render_template("index.html", search_results=results, alpha=alpha, gamma=gamma)
+    return render_template("index.html", search_results=results, alpha=alpha, gamma=gamma, user_input=user_input)
 
 if __name__ == "__main__":
     app.run()
