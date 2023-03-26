@@ -1,8 +1,7 @@
 import math
 import pickle
 from string2words import requete2words
-
-stemmer = FrenchStemmer()
+import re
 
 with open("../data/idf.dict", 'rb') as idf_file:
     idf = pickle.load(idf_file)
@@ -12,6 +11,9 @@ with open("../data/pagerank.vector", 'rb') as pagerank_file:
 
 with open("../data/word_page.dict", 'rb') as word_page_file:
     word_page_relationships = pickle.load(word_page_file)
+
+with open("../data/titles.vector", 'rb') as titles_file:
+    titles = pickle.load(titles_file)
 
 spec_regex = re.compile(r'[^a-z ]+')
 
@@ -59,4 +61,7 @@ def bestPages(alpha, gamma, requete):
     word_page = [word_page_relationships[w] for w in words]
     idfs = [idf[w] for w in words]
     pages = common_pages(word_page)
-    return scores(alpha, gamma, idfs, pages, pageranks)
+    return [titles[s] for s in scores(alpha, gamma, idfs, pages, pageranks)]
+
+# test pour toto
+# print(bestPages(0.5, 0.5, "football paris")[:10])
