@@ -12,6 +12,7 @@ import numpy as np
 from queue import Queue
 import argparse
 import sys
+from string2words import requete2words
 
 def printerr(str=None):
     print("Waited: python " + sys.argv[0] + " [input file] [input file idf] [output file word page relationship] [minimum tf-idf gardé]")
