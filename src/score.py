@@ -1,4 +1,20 @@
 import math
+import pickle
+import unicodedata
+from nltk.stem.snowball import FrenchStemmer
+
+stemmer = FrenchStemmer()
+
+with open("../data/idf.dict", 'rb') as idf_file:
+    idf = pickle.load(idf_file)
+
+with open("../data/pagerank.vector") as pagerank_file:
+    pageranks = pickle.load(pagerank_file)
+
+with open("../data/word_page.dict") as word_page_file:
+    word_page_relationships = pickle.load(word_page_file)
+
+spec_regex = re.compile(r'[^a-z ]+')
 
 def requete(list):
     k=len(list)
@@ -39,6 +55,16 @@ def scores(alpha, gamma, idfs, pages, pageranks):
     res.sort(key = lambda x: x[1], reverse = True)
     return [r[0] for r in res]
 
-def bestPages(alpha, gamma, word_page, idfs, pageranks):
+def bestPages(alpha, gamma, requete):
+    words = requete2words(requete)
+    word_page = [word_page_relationships[w] for w in words]
+    idfs = [idf[w] for w in words]
     pages = requete(word_page)
     return scores(alpha, gamma, idfs, pages, pageranks)
+
+def requete2words(requete):
+    requete = requete.lower()
+    requete = unicodedata.normalize('NFKD', requete)
+    requete = ''.join(c for c in str if not unicodedata.combining(c))
+    requete = spec_regex.sub(r'', requete)
+    return [stemmer.stem[w] for w in requete.split()]
