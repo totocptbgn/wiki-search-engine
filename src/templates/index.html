@@ -24,8 +24,6 @@
         }
 
     </script>
-    
-    
 </head>
 <body>
     <form method="POST" class="search-form">
@@ -37,21 +35,25 @@
         <div id="advanced-settings" style="display:none;">
 
             <div class="slider-container">
-                <label for="alpha">Alpha: <span id="alpha-value">0.50</span></label>
-                <input type="range" min="0" max="1" step="0.01" value="0.5" name="alpha" class="slider" id="alpha" oninput="updateAlphaValue(this.value);" style="margin-right: 10px;">
+                <label for="alpha">Alpha: <span id="alpha-value">{{ alpha }}</span></label>
+                <input type="range" min="0" max="1" step="0.01" value="{{ alpha }}" name="alpha" class="slider" id="alpha" oninput="updateAlphaValue(this.value);" style="margin-right: 10px;">
             </div>
             <div class="slider-container">
-                <label for="gamma" style="margin-left: 10px;">Gamma: <span id="gamma-value">0.50</span></label>
-                <input type="range" min="0" max="1" step="0.01" value="0.5" name="gamma" class="slider" id="gamma" oninput="updateGammaValue(this.value);">
+                <label for="gamma" style="margin-left: 10px;">Gamma: <span id="gamma-value">{{ gamma }}</span></label>
+                <input type="range" min="0" max="1" step="0.01" value="{{ gamma }}" name="gamma" class="slider" id="gamma" oninput="updateGammaValue(this.value);">
             </div>
             
         </div>
     </form>
 
-    <div id="results">
-        {% for result in search_results %}
-            <p>{{ result }}</p>
-        {% endfor %}
+    <div id="results" style="display: {% if search_results %}block{% else %}none{% endif %};">
+        {% if search_results %}
+            {% for result in search_results %}
+                <p>{{ result }}</p>
+            {% endfor %}
+        {% else %}
+            <p>Aucun résultat trouvé</p>
+        {% endif %}
     </div>
 </body>
 </html>
