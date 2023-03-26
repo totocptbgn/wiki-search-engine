@@ -15,8 +15,6 @@ with open("../data/word_page.dict", 'rb') as word_page_file:
 with open("../data/titles.vector", 'rb') as titles_file:
     titles = pickle.load(titles_file)
 
-spec_regex = re.compile(r'[^a-z ]+')
-
 def common_pages(list):
     k=len(list)
     pointeur = [0]*k
@@ -58,8 +56,15 @@ def scores(alpha, gamma, idfs, pages, pageranks):
 
 def bestPages(alpha, gamma, requete):
     words = requete2words(requete)
-    word_page = [word_page_relationships[w] for w in words]
-    idfs = [idf[w] for w in words]
+    word_page = []
+    idfs = []
+    for w in words:
+        wp = word_page_relationships.get(w)
+        if wp is not None:
+            word_page.append(wp)
+        i = idf.get(w)
+        if i is not None:
+            idfs.append(i)
     pages = common_pages(word_page)
     return [titles[s] for s in scores(alpha, gamma, idfs, pages, pageranks)]
 
