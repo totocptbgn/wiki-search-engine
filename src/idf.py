@@ -8,6 +8,7 @@ import re
 from collections import Counter
 import math
 import pickle
+from string2words import requete2words
 
 def printerr(str=None):
     print("Waited: python " + sys.argv[0] + " [input file] [output file idf] [nombre mots max gardés]")
@@ -48,6 +49,9 @@ if __name__ == '__main__':
     text = []
 
     for event, elem in tqdm(etree.iterparse(args.input_file, events=("end",))):
+        if elem.tag == 'title':
+            for w in requete2words(elem.text):
+                occur[w] = math.inf
         if elem.tag == 'text':
             words = word_regex.findall(elem.text)
             page = Counter(words)
